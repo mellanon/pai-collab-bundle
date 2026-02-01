@@ -1,4 +1,7 @@
 import { Command } from "commander";
+import { requireBlackboardRoot } from "../lib/discovery";
+import { readAllProjects } from "../lib/parsers";
+import { output } from "../lib/output";
 
 export const projectCommand = new Command("project")
   .description("Manage blackboard projects");
@@ -7,8 +10,22 @@ projectCommand
   .command("list")
   .description("List all registered projects")
   .action(() => {
-    console.error("Not yet implemented: collab project list");
-    process.exit(1);
+    const root = requireBlackboardRoot();
+    const projects = readAllProjects(root.path);
+    const rows = projects.map(({ dirName, project }) => ({
+      name: project.name,
+      dirName,
+      maintainer: project.maintainer,
+      status: project.status,
+      type: project.type ?? "",
+    }));
+
+    const parent = projectCommand.parent;
+    if (parent?.opts().pretty) {
+      console.table(rows);
+    } else {
+      output(rows);
+    }
   });
 
 projectCommand
