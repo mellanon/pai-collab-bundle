@@ -1,0 +1,9 @@
+{
+  "name": "pai-collab-bundle",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "test": "bun test --recursive",
+    "typecheck": "bun run --filter '*' typecheck"
+  }
+}
