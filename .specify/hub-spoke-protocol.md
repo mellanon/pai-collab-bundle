@@ -98,6 +98,20 @@ git:
   behindRemote: 0
 ```
 
+## Execution Model
+
+The protocol is execution-context agnostic. The contract is **files in a repo** — anything that produces valid manifest.yaml and status.yaml can participate.
+
+| Context | How it works | PAI required? |
+|---------|-------------|---------------|
+| **Local** | Developer/agent runs `collab spoke sync` on their machine | CLI only |
+| **GitHub Actions** | `.github/workflows/collab-sync.yml` runs CLI on push or schedule | No — GH Action installs CLI |
+| **PAI Agent** | Heartbeat daemon or session agent runs CLI as part of workflow | Yes |
+
+The GitHub Actions path is significant: **a spoke doesn't need PAI at all.** Any repo can join the network by adding a `.collab/manifest.yaml` (hand-written, ~10 lines) and a CI workflow that runs `collab spoke sync`. This keeps the barrier to entry minimal — the protocol prescribes the signaling contract, not the methodology or tooling.
+
+For the notification direction (spoke → hub), the same CI step can post status updates to the hub via `gh api` — commenting on issues, updating project status, or triggering webhooks. The spoke's CI becomes the nervous system endpoint.
+
 ## How the CLI Uses This
 
 ### From the spoke (developer working on the project)
